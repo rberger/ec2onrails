@@ -51,6 +51,7 @@ end
   ca-certificates
   cron
   curl
+  emacs21-nox
   flex
   gcc
   git-core
@@ -105,9 +106,12 @@ end
   "mongrel_cluster",
   "optiflag",
   "rails",
-  "rails -v 2.0.2",
-  "rails -v 1.2.6",
-  "rake"
+  "rails -v 2.1.1",
+  "rake",
+  "ruby-debug",
+  "geminstaller",
+  "gchartrb",
+  "crypt"
 ]
 
 @build_root = "/mnt/build"
