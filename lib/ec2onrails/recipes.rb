@@ -235,8 +235,8 @@ Capistrano::Configuration.instance.load do
         Move the MySQL database to Amazon's Elastic Block Store (EBS), \
         which is a persistant data store for the cloud.
         OPTIONAL PARAMETERS:
-          * SIZE: Pass in num in gigs, like 10, to set the size, otherwise it will \
-        default to 10 gigs.
+          * SIZE: Pass in a number representing the GB's to hold, like 10. \
+            It will default to 10 gigs.
           * VOLUME_ID: The volume_id to use for the mysql database    
         NOTE: keep track of the volume ID, as you'll want to keep this for your \
         records and probably add it to the :db role in your deploy.rb file \
@@ -473,7 +473,7 @@ FILE
       end
       
       desc <<-DESC
-        Dump the MySQL database to the S3 bucket specified by \
+        Dump the MySQL database to ebs (if enabled) or the S3 bucket specified by \
         ec2onrails_config[:archive_to_bucket]. The filename will be \
         "database-archive/<timestamp>/dump.sql.gz".
       DESC
@@ -493,7 +493,7 @@ FILE
       desc <<-DESC
         [internal] Initialize the default backup folder on S3 (i.e. do a full
         backup of the newly-created db so the automatic incremental backups 
-        make sense).
+        make sense).  NOTE: Only of use if you do not have ebs enabled
       DESC
       task :init_backup, :roles => :db do
         server.allow_sudo do
@@ -548,6 +548,7 @@ FILE
       
       task :init_services do
         server.allow_sudo do
+          #lets pick up the new configuration files
           sudo "/usr/local/ec2onrails/bin/init_services.rb"
         end
       end
@@ -597,7 +598,9 @@ FILE
         Install extra Ubuntu packages. Set ec2onrails_config[:packages], it \
         should be an array of strings.
         NOTE: the package installation will be non-interactive, if the packages \
-        require configuration either log in as 'root' and run \
+        require configuration either set ec2onrails_config[:interactive_packages] \
+        like you would for ec2onrails_config[:packages] (we'll flood the server \
+        with 'Y' inputs), or log in as 'root' and run \
         'dpkg-reconfigure packagename' or replace the package's config files \
         using the 'ec2onrails:server:deploy_files' task.
       DESC
@@ -605,6 +608,16 @@ FILE
         sudo "aptitude -q update"
         if cfg[:packages] && cfg[:packages].any?
           sudo "sh -c 'export DEBIAN_FRONTEND=noninteractive; aptitude -q -y install #{cfg[:packages].join(' ')}'"
+        end
+        if cfg[:interactive_packages] && cfg[:interactive_packages].any?
+          # sudo "aptitude install #{cfg[:interactive_packages].join(' ')}", {:env => {'DEBIAN_FRONTEND' => 'readline'} }
+          #trying to pick WHEN to send a Y is a bit tricky...it totally depends on the 
+          #interactive package you want to install.  FLOODING it with 'Y'... but not sure how
+          #'correct' or robust this is
+          cmd = "sudo sh -c 'export DEBIAN_FRONTEND=readline; aptitude -y -q install #{cfg[:interactive_packages].join(' ')}'"
+          run(cmd) do |channel, stream, data|
+              channel.send_data "Y\n"
+          end
         end
       end
 
@@ -617,18 +630,14 @@ FILE
       task :harden_server do
         #NOTES: for those security features that will get in the way of ease-of-use
         #       hook them in here
+        # Like encrypting the mnt directory
+        # http://groups.google.com/group/ec2ubuntu/web/encrypting-mnt-using-cryptsetup-on-ubuntu-7-10-gutsy-on-amazon-ec2
         if cfg[:harden_server]
           #lets install some extra packages:
           # denyhosts: sshd security tool.  config file is already installed... 
           #
           security_pkgs = %w{denyhosts}
-          old_pkgs = cfg[:packages]
-          begin
-            cfg[:packages] = security_pkgs
-            install_packages
-          ensure
-            cfg[:packages] = old_pkgs
-          end
+          sudo "sh -c 'export DEBIAN_FRONTEND=noninteractive; aptitude -q -y install #{security_pkgs.join(' ')}'"
         end
       end
       

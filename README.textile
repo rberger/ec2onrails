@@ -2,9 +2,9 @@ h1. EC2 on Rails
 
 h2. Deploy a Ruby on Rails app on EC2 in five minutes
 
-Main Page: "https://ec2onrails.rubyforge.org":https://ec2onrails.rubyforge.org
+Main Page: "http://ec2onrails.rubyforge.org":http://ec2onrails.rubyforge.org
 
-Code on Github: "https://github.com/pauldowman/ec2onrails":https://github.com/pauldowman/ec2onrails
+Code on Github: "http://github.com/pauldowman/ec2onrails":http://github.com/pauldowman/ec2onrails
 
 EC2 on Rails is an Ubuntu Linux server image for "Amazon's EC2 hosting service":http://www.amazon.com/b/ref=sc_fe_l_2/102-6342260-7987311?ie=UTF8&node=201590011&no=3435361 that's ready to run a standard Ruby on Rails application with little or no customization. It's a Ruby on Rails "virtual appliance":http://en.wikipedia.org/wiki/Virtual_appliance.
 
@@ -60,11 +60,11 @@ h4. 2. Add the config files to your Rails app
 You will need to place "Capfile":http://github.com/pauldowman/ec2onrails/tree/master/examples/Capfile?raw=true in the root of your rails folder, and put "deploy.rb":http://github.com/pauldowman/ec2onrails/tree/master/examples/deploy.rb?raw=true  and "s3.yml":http://github.com/pauldowman/ec2onrails/tree/master/examples/s3.yml?raw=true in the config folder.
 
 Within your rails directory, run
-<code>
+<pre>
   wget -q -O Capfile http://github.com/pauldowman/ec2onrails/tree/master/examples/Capfile?raw=true
   wget -q -O config/deploy.rb http://github.com/pauldowman/ec2onrails/tree/master/examples/deploy.rb?raw=true
   wget -q -O config/s3.yml http://github.com/pauldowman/ec2onrails/tree/master/examples/s3.yml?raw=true
-</code>
+</pre>
 
 
 _Be sure to customize those files and read the comments._
@@ -163,7 +163,7 @@ h4. Notes
 
 h4. Getting started...
 
-* launch one of Eric's default images (see "Eric Hammond's":http://alestic.com/ page for the most recent ami-images): <code>ec2-run-instances ami-179e7a7e -k amazon-keypair</code> (for a 64-bit image, launch: <code>ec2-run-instances ami-f89d7991 -k amazon-keypair --instance-type m1.large</code>)
+* launch one of Eric's default images (see "Eric Hammond's":http://alestic.com/ page for the most recent ami-images): <code>ec2-run-instances ami-1cd73375 -k amazon-keypair</code> (for a 64-bit image, launch: <code>ec2-run-instances ami-17d7337e -k amazon-keypair --instance-type m1.large</code>)
 * lets get your amazon keypair up onto the instance: <code>scp -i ~/.ssh/id_rsa-amazon-keypair ~/.ec2/{cert,pk}-*.pem root@HOST_PUBLIC_ADDRESS:/mnt/</code>
 * ditto for getting the ec2onrails server code up onto your new instance: <code>scp -rp -i ~/.ssh/id_rsa-amazon-keypair ~/your/copy/of/ec2onrails/. root@HOST_PUBLIC_ADDRESS:/mnt/ec2onrails</code>
 * time to log into your instance: <code>ssh -i ~/.ssh/id_rsa-amazon-keypair root@HOST_PUBLIC_ADDRESS</code>
