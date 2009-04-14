@@ -1,0 +1,4 @@
+--- 
+/mnt/hadoop_datastore: 
+  volume_id: vol-2255b54b
+  block_loc: /dev/sdc

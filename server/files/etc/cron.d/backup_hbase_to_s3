@@ -1,0 +1,2 @@
+#   Full snapshot every 2 hours
+20 */2 * * *  root  test -f /etc/ec2onrails/ebs_hbase_info.yml && /usr/local/ec2onrails/bin/backup_hbase.rb
